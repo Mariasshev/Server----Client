@@ -49,31 +49,40 @@ LRESULT CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
 		if ((wParam) == IDC_BUTTON2)
 		{
-			WSAStartup(MAKEWORD(2, 2), &wsaData);
+            if (_socket != INVALID_SOCKET)
+            {
+                acceptSocket = accept(_socket, NULL, NULL);
+                char buf[MAXSTRLEN];
+                int i = recv(acceptSocket, buf, MAXSTRLEN, 0);
+                buf[i] = '\0';
+                SendMessageA(hWrite, EM_SETSEL, -1, -1);
+                SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)buf);
+                SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)"\r\n");
 
-			_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+                char buff[MAXSTRLEN];
+                GetWindowTextA(hWrite, buff, sizeof(buff));
+                SetWindowTextA(hWrite, "");
 
-			addr.sin_family = AF_INET;
+                send(acceptSocket, buff, strlen(buff), 0);
+            }
+            else
+            {
+                WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-			inet_pton(AF_INET, "0.0.0.0", &addr.sin_addr);
+			    _socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-			addr.sin_port = htons(20000);
-			bind(_socket, (SOCKADDR*)&addr, sizeof(addr));
-			listen(_socket, 1);
+			    addr.sin_family = AF_INET;
 
-			acceptSocket = accept(_socket, NULL, NULL);
-            char buf[MAXSTRLEN];
-            int i = recv(acceptSocket, buf, MAXSTRLEN, 0);
-            buf[i] = '\0';
-            SendMessageA(hWrite, EM_SETSEL, -1, -1);
-            SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)buf);
-            SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)"\r\n");
+			    inet_pton(AF_INET, "0.0.0.0", &addr.sin_addr);
 
-            /*char buff[MAXSTRLEN];
-            GetWindowTextA(hWrite, buff, sizeof(buff));
-            SetWindowText(hWrite, TEXT(" "));
+			    addr.sin_port = htons(20000);
+			    bind(_socket, (SOCKADDR*)&addr, sizeof(addr));
+			    listen(_socket, 1);
+            }
 
-            send(acceptSocket, buff, strlen(buff), 0);*/
+			
+
+
 		}
 
 		
