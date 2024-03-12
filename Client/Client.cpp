@@ -14,7 +14,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 using namespace std;
 
-HWND hRead, hWrite, hConnect, hSend, hialog;
+HWND hRead, hWrite, hConnect, hSend,hEnd, hialog;
 
 const int MAXSTRLEN = 255;
 WSADATA wsaData;
@@ -28,9 +28,8 @@ void InitEdit(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     hWrite = GetDlgItem(hDlg, IDC_EDIT2);
 
     hConnect = GetDlgItem(hDlg, IDC_BUTTON1);
+    hEnd = GetDlgItem(hDlg, IDC_BUTTON3);
     hSend = GetDlgItem(hDlg, IDC_BUTTON2);
-
-
 
 }
 
@@ -52,27 +51,38 @@ LRESULT CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		if ((wParam) == IDC_BUTTON1)
 		{
+            if (_socket != INVALID_SOCKET) 
+            {
+                char buf[MAXSTRLEN];
+                GetWindowTextA(hWrite, buf, sizeof(buf));
+                SetWindowText(hWrite, TEXT(" "));
 
-			WSAStartup(MAKEWORD(2, 2), &wsaData);
+                send(_socket, buf, strlen(buf), 0);
+            }
+            else
+            {
+                WSAStartup(MAKEWORD(2, 2), &wsaData);
 
-			_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+                _socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-			addr.sin_family = AF_INET;
+                addr.sin_family = AF_INET;
 
-			inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
-			addr.sin_port = htons(20000);
-			connect(_socket, (SOCKADDR*)&addr, sizeof(addr));
+                inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr);
+                addr.sin_port = htons(20000);
+                connect(_socket, (SOCKADDR*)&addr, sizeof(addr));
 
-            char buf[MAXSTRLEN];
-            const char* text = "Hello world!";
-
-            send(_socket, text, strlen(text), 0);
-
+            }
             closesocket(_socket);
             WSACleanup();
 		}
     }
     break;
+
+    case IDC_BUTTON3:
+        PostQuitMessage(0);
+        closesocket(_socket);
+        WSACleanup();
+        break;
 
     case WM_DESTROY:
         PostQuitMessage(0);

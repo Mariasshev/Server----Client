@@ -13,7 +13,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 using namespace std;
 
-HWND hRead, hWrite, hStart, hSend, hialog;
+HWND hRead, hWrite, hStart, hSend, hEnd, hialog;
 const int MAXSTRLEN = 255;
 WSADATA wsaData;
 SOCKET _socket;
@@ -27,6 +27,7 @@ void InitEdit(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     hWrite = GetDlgItem(hDlg, IDC_EDIT3);
 
     hStart = GetDlgItem(hDlg, IDC_BUTTON2);
+    hEnd = GetDlgItem(hDlg, IDC_BUTTON3);
     hSend = GetDlgItem(hDlg, IDC_BUTTON1);
 
 }
@@ -68,11 +69,22 @@ LRESULT CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)buf);
             SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)"\r\n");
 
-			
+            /*char buff[MAXSTRLEN];
+            GetWindowTextA(hWrite, buff, sizeof(buff));
+            SetWindowText(hWrite, TEXT(" "));
+
+            send(acceptSocket, buff, strlen(buff), 0);*/
 		}
 
 		
     break;
+
+    case IDC_BUTTON3:
+        PostQuitMessage(0);
+        closesocket(acceptSocket);
+        closesocket(_socket);
+        WSACleanup();
+        break;
 
     case WM_DESTROY:
         PostQuitMessage(0);
