@@ -60,15 +60,15 @@ LRESULT CALLBACK DlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 send(_socket, buf, strlen(buf), 0);
 
 
-                char buf[MAXSTRLEN];
-                int i = recv(_socket, buf, MAXSTRLEN, 0);
+                char buffer[MAXSTRLEN];
+                int i = recv(_socket, buffer, MAXSTRLEN, 0);
                 if (i > 0) {
                     buf[i] = '\0';
                     SendMessageA(hWrite, EM_SETSEL, -1, -1);
-                    SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)buf);
+                    SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)buffer);
                     SendMessageA(hWrite, EM_REPLACESEL, TRUE, (LPARAM)"\r\n");
 
-
+                }
             }
             else
             {
